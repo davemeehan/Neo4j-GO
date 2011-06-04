@@ -228,8 +228,9 @@ filter := map[string]string {
 }
 /*
 Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string)
+some possible values: uniqueness:[node|node path],  filter names:[all|all but start node] 
 */
-templateSet, err := neo.Traverse(self, "node", "depth first", "node", nil, 2, nil, filter) //uniqueness:[node|node path],  filters:[all|all but start node] 
+templateSet, err := neo.Traverse(self, "node", "depth first", "node", nil, 2, nil, filter) //
 if err != nil {
 	log.Printf("Traverse failed with error: %v\n",err)
 } else {
