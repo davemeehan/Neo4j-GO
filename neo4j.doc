@@ -1,0 +1,93 @@
+PACKAGE
+
+package neo4j
+import "org/neo4j"
+
+TYPES
+
+type Neo4j struct {
+    Method         string // which http method
+    BaseURL        string // probably a combination of the following vars
+    ServerAddr     string
+    ServerPort     string
+    ServerBasePath string
+    StatusCode     int                 // last http status code received
+    Errors         map[string]os.Error // holds neo4j error strings
+}
+general neo4j config
+
+var Neo *Neo4j
+
+func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxType string) os.Error
+
+func (this *Neo4j) CreateNode(m map[string]string) (tmp NeoTemplate, err os.Error)
+CreateNode
+
+func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool) os.Error
+CreateProperty
+
+func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string, rType string) os.Error
+CreateRelationship
+
+func (this *Neo4j) DelNode(id uint) os.Error
+DelNode
+
+func (this *Neo4j) DelProperty(id uint, s string) os.Error
+DelProperty
+
+func (this *Neo4j) DelRelationship(id ...uint) os.Error
+DelRelationship
+
+func (this *Neo4j) EscapeString(s string) string
+ shamelessly taken from golang html pkg
+
+func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error)
+GetNode
+
+func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error)
+GetProperties
+
+func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error)
+GetProperty
+
+func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string) (map[int]NeoTemplate, os.Error)
+GetRelationshipByNode
+
+func (this *Neo4j) SearchIdx(key string, value string, query string, cat string, idxType string) (map[int]NeoTemplate, os.Error)
+Lucene query lang: http://lucene.apache.org/java/3_1_0/queryparsersyntax.html
+example query: the_key:the_* AND the_other_key:[1 TO 100]
+
+func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os.Error
+SetProperty
+
+func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error
+SetRelationship
+
+func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]NeoTemplate, os.Error)
+
+func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]string, depth uint, algo string, paths bool) (map[int]NeoTemplate, os.Error)
+
+type NeoTemplate struct {
+    Neo4j
+    ID                  uint
+    Relationships       string
+    RelationshipsOut    string
+    RelationshipsIn     string
+    RelationshipsAll    string
+    RelationshipsCreate string
+    Data                map[string]interface{}
+    Traverse            string
+    Property            string
+    Properties          string
+    Self                string
+    Extensions          map[string]interface{}
+    Start               string        // relationships & traverse // might have to break into two vars because sometimes neo4j uses "start" to store a string, sometimes it is an object
+    End                 string        // relationships & traverse // might have to break into two vars because sometimes neo4j uses "end" to store a string, sometimes it is an object
+    Type                string        // relationships & traverse
+    Indexed             string        // index related
+    Length              string        // traverse framework
+    Nodes               []interface{} // traverse framework
+    TRelationships      []interface{} // traverse framework
+}
+used when storing data returned from a neo4j
+
