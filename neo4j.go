@@ -1,4 +1,4 @@
-/**
+/** 
 Neo4j REST client library written in GO
 I took two methods from the Golang HTML package: EscapeString & escape. I appreciate it! Both of these are Copyright 2010 The Go Authors. All rights reserved.
 
