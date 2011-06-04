@@ -767,6 +767,7 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]NeoTemplate, err os.Erro
 	return
 }
 func init() {
+	// just some defaults
 	Neo = new(Neo4j)
 	Neo.ServerAddr = "127.0.0.1"
 	Neo.ServerPort = "7474"
