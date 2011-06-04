@@ -28,9 +28,8 @@ node := map[string]string {
 }
 	
 template,_ := neo.CreateNode(node)
-if debug {
-	fmt.Printf("\nTemplate data: %v\n",template.ID)
-}
+fmt.Printf("\nTemplate data: %v\n",template.ID)
+
 
 // this should error because at this point no relationships would exist on this newly created node
 data, err := neo.GetRelationshipsOnNode(template.ID, "KNOWS", "all") // id(uint), type string, direction string
@@ -45,9 +44,7 @@ if err != nil {
 self := template.ID // easier to reference and examples below reuse the template var
 
 template, _ = neo.GetNode(self)
-if debug {
-	fmt.Printf("\nTemplate data: %v\n",template.ID)
-}
+fmt.Printf("\nTemplate data: %v\n",template.ID)
 
 
 err = neo.DelProperty(self,"test1")
