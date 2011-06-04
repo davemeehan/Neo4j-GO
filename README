@@ -45,6 +45,8 @@ Usage:
 
 import(
 	"neo4j"
+	"fmt"
+	"log"
 )
 
 neo := neo4j.Neo
