@@ -1,0 +1,220 @@
+Install:
+If you don't have GOROOT in your environment make sure you set it to your base go dir.
+for example: 
+#: export GOROOT=/usr/local/go
+
+to install:
+#: cd Neo4j-GO
+#: make && make install
+
+Usage:
+
+import(
+	"neo4j"
+)
+
+neo := neo4j.Neo
+
+// these are the defaults set in the init() func
+neo.ServerAddr = "127.0.0.1"
+neo.ServerPort = "7474"
+neo.ServerBasePath = "/db/data"
+
+
+
+node := map[string]string { 
+	"test1" : "foo", 
+	"test2" : "bar",
+}
+	
+template,_ := neo.CreateNode(node)
+if debug {
+	fmt.Printf("\nTemplate data: %v\n",template.ID)
+}
+
+// this should error because at this point no relationships would exist on this newly created node
+data, err := neo.GetRelationshipsOnNode(template.ID, "KNOWS", "all") // id(uint), type string, direction string
+if err != nil {
+	log.Printf("GetRelationshipsOnNode error: %v\n",err)	
+} else {
+	for k,v := range data { // loop the dataSet returned and print array key(int) and relationship ID
+		log.Printf("%v is: %v\n",k,v.ID)
+	}
+}
+
+self := template.ID // easier to reference and examples below reuse the template var
+
+template, _ = neo.GetNode(self)
+if debug {
+	fmt.Printf("\nTemplate data: %v\n",template.ID)
+}
+
+
+err = neo.DelProperty(self,"test1")
+if err != nil {
+	log.Printf("Del Property failed with: %v\n",err)	
+} else {
+	log.Printf("Deleted property from node\n")
+}
+
+// might work if you have run a few tests already
+err = neo.DelNode((self-1))
+if err != nil {
+	log.Printf("Del Node failed with: %v\n",err)
+} else {
+	log.Printf("Deleted node\n")
+}
+
+node2 := map[string]string { 
+	"test45" : "foo", 
+	"test46" : "bar",
+}
+err = neo.CreateProperty(self, node2, false) // id(uint), data(map), replace old data?(bool)
+if err != nil {
+	log.Printf("Create Property failed with error: %v\n",err)
+} else {
+	log.Printf("Properties updated for node: %v\n",self)
+}
+
+template, err = neo.GetProperties(self) // id(uint)
+if err != nil {
+	log.Printf("Get Properties failed with error: %v\n",err)	
+} else {
+	log.Printf("Properties on node: %v\n",template.Data)
+}
+
+propVal, err := neo.GetProperty(self,"test45") // id(uint), name
+if err != nil {
+	log.Printf("Get Property failed with error: %v\n",err)	
+} else {
+	log.Printf("Property on node: %v\n",propVal)
+}
+
+pdata := map[string]string {
+	"test45":"foobar",
+}
+err = neo.SetProperty(self, pdata, false) // id(uint), data map[string]string, replace bool (remove properties not specified?)
+if err != nil {
+	log.Printf("Set Prop failed with: %v\n",err)	
+} else {
+	log.Printf("Property updated.\n")
+}
+
+propVal, err = neo.GetProperty(self,"test45") // id(uint), name(string)
+if err != nil {
+	log.Printf("Get Property failed with error: %v\n",err)	
+} else {
+	log.Printf("Property on node: %v\n",propVal)
+}
+
+ndata := map[string]string {
+	"date":"May 26th 2011",
+	"traverse":"true",
+}
+err = neo.CreateRelationship(self, (self-1), ndata, "KNOWS") // node id(uint), to node id(uint), data(map[string]string), type
+if err != nil {
+	log.Printf("Create Relationship failed with error: %v\n",err)	
+} else {
+	log.Printf("Relationship created for node: %v\n",self)
+}
+
+err = neo.CreateRelationship(self, (self-2), ndata, "KNOWS") // node id(uint), to node id(uint), data(map[string]string), type
+if err != nil {
+	log.Printf("Create Relationship failed with error: %v\n",err)	
+} else {
+	log.Printf("Relationship created for node: %v\n",self)
+}
+
+
+err = neo.DelRelationship(0,1) // list of uints that are relationship ids
+if err != nil {
+	log.Printf("Del Relationship failed with error: %v\n",err)
+} else {
+	log.Printf("Relationship deleted.\n")
+}
+
+
+rdata := map[string]string {
+	"date":"May 27th 2011",
+	"traverse":"false",
+}
+
+err = neo.SetRelationship(5, rdata) // relationship id uint, map[string]string 
+if err != nil {
+	log.Printf("Set relationship failed with error: %v\n",err)	
+} else {
+	log.Printf("Relationship properties updated.\n")
+}
+
+err = neo.CreateIdx(self, "a_test", "boo", "a type here", "node") // idx key(string), idx value(string), idx category(string), idx type[node|relationship](string)
+if err != nil {
+	log.Printf("CreateIdx failed with error: %v\n",err)	
+} else {
+	log.Printf("Idx created.\n")
+}
+err = neo.CreateIdx((self-1), "a_test", "testing1", "a type here", "node") // idx key(string), idx value(string), idx category(string), idx type[node|relationship](string)
+if err != nil {
+	log.Printf("CreateIdx failed with error: %v\n",err)	
+} else {
+	log.Printf("Idx created.\n")
+}
+err = neo.CreateIdx((self-3), "a_test", "testing2", "a type here", "node") // idx key(string), idx value(string), idx category(string), idx type[node|relationship](string)
+if err != nil {
+	log.Printf("CreateIdx failed with error: %v\n",err)	
+} else {
+	log.Printf("Idx created.\n")
+}
+
+templateSet, err := neo.SearchIdx("a_test","testing1","", "a type here", "node") // idx key(string), idx value(string), lucene query(string), idx category(string), idx type[node|relationship](string)
+if err != nil {
+	log.Printf("Search failed with error: %v\n",err)	
+} else {
+	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+		log.Printf("%v is: %v\n",k,v.ID)
+	}
+}
+
+// same query as above but using the lucene query language
+templateSet, err = neo.SearchIdx("","","a_test:testing2", "a type here", "node") // idx key(string), idx value(string), lucene query(string), idx category(string), idx type[node|relationship](string)
+if err != nil {
+	log.Printf("Search failed with error: %v\n",err)	
+} else {
+	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+		log.Printf("%v is: %v\n",k,v.ID)
+	}
+}
+
+tdata := map[string]string {
+	"type":"KNOWS",
+	"direction":"all",
+}
+templateSet, err := neo.TraversePath(self,(self-4),tdata,10,"shortestPath", true) //src id(uint), dst id(uint), relationships(map[string]string), depth(uint), algorithm(string), paths(bool), find paths between? 
+if err != nil {
+	log.Printf("TraversePath failed with error: %v\n",err)
+} else {
+	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+		log.Printf("%v is: %v\n",k,v.TRelationships)
+	}
+}
+
+templateSet, err = neo.TraversePath(self,(self-4),tdata,2,"shortestPath", true) //src id(uint), dst id(uint), relationships(map[string]string), depth(uint), algorithm(string), paths(bool), find paths between? 
+if err != nil {
+	log.Printf("Traverse failed with error: %v\n",err)	
+} else {
+	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+		log.Printf("%v is: %v\n",k,v.Nodes)
+	}
+}
+filter := map[string]string {
+	"language":"builtin",
+	"name":"all but start node",
+}
+//Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string)
+templateSet, err := neo.Traverse(self, "node", "depth first", "node", nil, 2, nil, filter) //uniqueness:[node|node path],  filters:[all|all but start node] 
+if err != nil {
+	log.Printf("Traverse failed with error: %v\n",err)
+} else {
+	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+		log.Printf("%v is: %v\n",k,v.Self)
+	}
+}
