@@ -142,7 +142,7 @@ if err != nil {
 
 ndata := map[string]string {
 	"date":"May 26th 2011",
-	"traverse":"true",
+	"test":"true",
 }
 /* node id(uint), to node id(uint), data(map[string]string), type */
 err = neo.CreateRelationship(self, (self-1), ndata, "KNOWS")
@@ -171,7 +171,7 @@ if err != nil {
 
 rdata := map[string]string {
 	"date":"May 27th 2011",
-	"traverse":"false",
+	"test":"false",
 }
 
 err = neo.SetRelationship(5, rdata) // relationship id uint, map[string]string 
