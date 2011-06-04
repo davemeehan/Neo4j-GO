@@ -400,7 +400,7 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 Traverse(node id uint, return type string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) returns array of NeoTemplate structs and any errors raised as os.Error
 */
 func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]NeoTemplate, os.Error) {
-	node, err := this.GetNode(id) // find properties for destination node so we can tie it into the relationship
+	node, err := this.GetNode(id) // find properties for destination node
 	if err != nil {
 		return nil, err
 	}
@@ -450,7 +450,7 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 TraversePath(src node id uint, dst node id uint, relationships map[string]string, depth uint, algorithm string, paths bool) returns array of NeoTemplate structs and any errors raised as os.Error
 */
 func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]string, depth uint, algo string, paths bool) (map[int]NeoTemplate, os.Error) {
-	dstNode, err := this.GetNode(dst) // find properties for destination node so we can tie it into the relationship
+	dstNode, err := this.GetNode(dst) // find properties for destination node
 	if err != nil {
 		return nil, err
 	}
