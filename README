@@ -34,7 +34,7 @@ Once you drop these two methods on the end of client.go, from the http dir, run 
 
 Install:
 If you don't have GOROOT in your environment make sure you set it to your base go dir.
-for example: 
+for example:
 #: export GOROOT=/usr/local/go
 
 to install:
