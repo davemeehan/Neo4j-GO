@@ -84,7 +84,7 @@ func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 		return "", err
 	}
 	this.Method = "get"
-	body, err := this.send(node.Properties+"/"+name, "") // convert uint -> string and send http request. no need for post body on get request
+	body, err := this.send(node.Properties+"/"+name, "")
 	if err != nil {
 		return "", err
 	}
@@ -99,7 +99,7 @@ func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 		return tmp, err
 	}
 	this.Method = "get"
-	body, err := this.send(node.Properties, "") // convert uint -> string and send http request. no need for post body on get request
+	body, err := this.send(node.Properties, "")
 	if err != nil {
 		return tmp, err
 	}
@@ -361,7 +361,7 @@ func (this *Neo4j) SearchIdx(key string, value string, query string, cat string,
 		url += "/" + strings.TrimSpace(key) + "/" + this.EscapeString(value)
 	}
 	this.Method = "get"
-	body, err := this.send(url, "") // convert uint -> string and send http request
+	body, err := this.send(url, "")
 	if err != nil {
 		return nil, err
 	}
