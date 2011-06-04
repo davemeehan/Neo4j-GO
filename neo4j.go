@@ -186,7 +186,7 @@ func (this *Neo4j) DelProperty(id uint, s string) os.Error {
 	return this.chkStatusCode("dp")
 }
 // DelNode(id uint) returns any errors raised as os.Error
-func (this *Neo4j) DelNode(id uint) os.Error { //prop ...interface{}
+func (this *Neo4j) DelNode(id uint) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
 		return err
