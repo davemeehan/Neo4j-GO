@@ -90,4 +90,3 @@ type NeoTemplate struct {
     TRelationships      []interface{} // traverse framework
 }
 used when storing data returned from a neo4j
-
