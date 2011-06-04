@@ -1,3 +1,37 @@
+Prereq:
+Neo4j uses HTTP Post, Get, Delete & Put methods. Tragically the default http pkg in GO does not include Delete & Put
+Unfortunately you must patch in two methods into the default http package on client.go and then recompile it:
+
+func (c *Client) Delete(url string) (r *Response, err os.Error) {
+        var req Request
+        req.Method = "DELETE"
+        if req.URL, err = ParseURL(url); err != nil {
+                return
+        }
+        return send(&req, c.Transport)
+}
+func (c *Client) Put(url string, bodyType string, body io.Reader) (r *Response, err os.Error) {
+        var req Request
+        req.Method = "PUT"
+        req.ProtoMajor = 1
+        req.ProtoMinor = 1
+        req.Close = true
+        req.Body = ioutil.NopCloser(body)
+        req.Header = Header{
+                "Content-Type": {bodyType},
+        }
+        req.TransferEncoding = []string{"chunked"}
+
+        req.URL, err = ParseURL(url)
+        if err != nil {
+                return nil, err
+        }
+
+        return send(&req, c.Transport)
+}
+
+Once you drop these two methods on the end of client.go, from the http dir, run a make && make install
+
 Install:
 If you don't have GOROOT in your environment make sure you set it to your base go dir.
 for example: 
