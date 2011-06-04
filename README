@@ -45,7 +45,6 @@ Usage:
 
 import(
 	"neo4j"
-	"fmt"
 	"log"
 )
 
@@ -64,7 +63,7 @@ node := map[string]string {
 }
 	
 template,_ := neo.CreateNode(node)
-fmt.Printf("\nTemplate data: %v\n",template.ID)
+log.Printf("\nTemplate data: %v\n",template.ID)
 self := template.ID
 
 // this should error because at this point no relationships would exist on this newly created node
@@ -79,7 +78,7 @@ if err != nil {
 
 
 template, _ = neo.GetNode(self)
-fmt.Printf("\nTemplate data: %v\n",template.ID)
+log.Printf("\nTemplate data: %v\n",template.ID)
 
 
 err = neo.DelProperty(self,"test1")
