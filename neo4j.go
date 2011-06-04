@@ -675,7 +675,7 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 					node.Extensions = vv
 				}
 			default:
-				log.Printf("Unknown type in JSON stream: %T from key: %v\n", vv, k)
+				log.Printf("*Notice: Unknown type in JSON stream: %T from key: %v\n", vv, k)
 			}
 		} else { // to my knowledge neo4j is only going to pass strings and arrays so if map assertion failed above try an array instead
 			data, assert = v.([]interface{}) // normal array?
