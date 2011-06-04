@@ -745,8 +745,8 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]NeoTemplate, err os.Erro
 	)
 	dataSet = make(map[int]NeoTemplate, 1)         // create first node(empty) of dataSet
 	err = json.Unmarshal([]byte(s), &templateNode) // unmarshal json data into blank interface. the json pkg will populate with the proper data types
-	if err != nil {
-		err = json.Unmarshal([]byte(s), &templateSet) // if unable to unmarshal into default template, try the relationship template. If that fails, raise an error
+	if err != nil { // fails on multiple results
+		err = json.Unmarshal([]byte(s), &templateSet) // if unable to unmarshal into single template, try an array of templates instead. If that fails, raise an error
 		if err != nil {
 			return nil, err
 		}
