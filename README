@@ -1,6 +1,6 @@
 Prereq:
 Neo4j uses HTTP Post, Get, Delete & Put methods. Tragically the default http pkg in GO does not include Delete & Put
-Unfortunately you must patch in two methods into the default http package on client.go and then recompile it:
+Unfortunately you must patch in two methods into the default http package on client.go and then recompile it: 
 
 func (c *Client) Delete(url string) (r *Response, err os.Error) {
         var req Request
