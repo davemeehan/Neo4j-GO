@@ -183,14 +183,6 @@ if err != nil {
 }
 
 /* idx key(string), idx value(string), idx category(string), idx type[node|relationship](string) */
-err = neo.CreateIdx(self, "a_test", "boo", "a type here", "node")
-if err != nil {
-	log.Printf("CreateIdx failed with error: %v\n",err)	
-} else {
-	log.Printf("Idx created.\n")
-}
-
-/* idx key(string), idx value(string), idx category(string), idx type[node|relationship](string) */
 err = neo.CreateIdx((self-1), "a_test", "testing1", "a type here", "node")
 if err != nil {
 	log.Printf("CreateIdx failed with error: %v\n",err)	
@@ -211,7 +203,7 @@ templateSet, err := neo.SearchIdx("a_test","testing1","", "a type here", "node")
 if err != nil {
 	log.Printf("Search failed with error: %v\n",err)	
 } else {
-	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+	for k,v := range templateSet { // loop the dataSet returned and print array
 		log.Printf("%v is: %v\n",k,v.ID)
 	}
 }
@@ -224,7 +216,7 @@ templateSet, err = neo.SearchIdx("","","a_test:testing2", "a type here", "node")
 if err != nil {
 	log.Printf("Search failed with error: %v\n",err)	
 } else {
-	for k,v := range templateSet { // loop the dataSet returned and print array key(int) and relationship ID
+	for k,v := range templateSet { // loop the dataSet returned and print array
 		log.Printf("%v is: %v\n",k,v.ID)
 	}
 }
