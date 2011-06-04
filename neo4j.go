@@ -72,7 +72,9 @@ var Neo *Neo4j
 // what chars to escape of course
 const escapedChars = `&'<>"*[]: `
 
-// Get Property(id uint, name string) returns string of property value and any error raised as os.Error
+/*
+Get Property(id uint, name string) returns string of property value and any error raised as os.Error
+*/
 func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 	if len(name) < 1 {
 		return "", os.NewError("Property name must be at least 1 character.")
@@ -88,7 +90,9 @@ func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 	}
 	return body, this.chkStatusCode("gp")
 }
-// GetProperties(id uint)  returns a NeoTemplate struct and any errors raised as os.Error
+/*
+GetProperties(id uint)  returns a NeoTemplate struct and any errors raised as os.Error
+*/
 func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
@@ -111,8 +115,10 @@ func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 	}
 	return template[0], this.chkStatusCode("gp")
 }
-// SetProperty(id uint, data map[string]string, replace bool) returns any error raised as os.Error
-// typically replace should be false unless you wish to drop any other properties *not* specified in the data you sent to SetProperty
+/*
+SetProperty(id uint, data map[string]string, replace bool) returns any error raised as os.Error
+typically replace should be false unless you wish to drop any other properties *not* specified in the data you sent to SetProperty
+*/
 func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
@@ -142,8 +148,10 @@ func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os
 	}
 	return this.chkStatusCode("sp")
 }
-// CreateProperty(id uint, data map[string]string, replace bool) returns any errors raised as os.Error
-// typically replace should be false unless you wish to drop any other properties *not* specified in the data you sent to CreateProperty
+/*
+CreateProperty(id uint, data map[string]string, replace bool) returns any errors raised as os.Error
+typically replace should be false unless you wish to drop any other properties *not* specified in the data you sent to CreateProperty
+*/
 func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
@@ -170,9 +178,11 @@ func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool)
 	}
 	return this.chkStatusCode("cp")
 }
-// DelProperty(id uint, s string) returns any errors raised as os.Error
-// pass in a id of the node and string as the the name/key of the property to delete
-// this should probably be extended to also delete relationship properties as well
+/*
+DelProperty(id uint, s string) returns any errors raised as os.Error
+pass in a id of the node and string as the the name/key of the property to delete
+this should probably be extended to also delete relationship properties as well
+*/
 func (this *Neo4j) DelProperty(id uint, s string) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
@@ -185,7 +195,9 @@ func (this *Neo4j) DelProperty(id uint, s string) os.Error {
 	}
 	return this.chkStatusCode("dp")
 }
-// DelNode(id uint) returns any errors raised as os.Error
+/*
+DelNode(id uint) returns any errors raised as os.Error
+*/
 func (this *Neo4j) DelNode(id uint) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
@@ -198,7 +210,9 @@ func (this *Neo4j) DelNode(id uint) os.Error {
 	}
 	return this.chkStatusCode("dn")
 }
-// CreateNode(data map[string]string) returns a NeoTemplate struct and any errors raised as os.Error 
+/*
+CreateNode(data map[string]string) returns a NeoTemplate struct and any errors raised as os.Error
+*/
 func (this *Neo4j) CreateNode(data map[string]string) (tmp NeoTemplate, err os.Error) {
 	s, err := json.Marshal(data) // serialize data for sending to neo4j
 	if err != nil {
@@ -216,7 +230,9 @@ func (this *Neo4j) CreateNode(data map[string]string) (tmp NeoTemplate, err os.E
 	}
 	return template[0], this.chkStatusCode("cn") // creating a node returns a single result
 }
-// GetNode(id uint) returns a NeoTemplate struct and any errors raised as os.Error
+/*
+GetNode(id uint) returns a NeoTemplate struct and any errors raised as os.Error
+*/
 func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error) {
 	if id < 1 {
 		return tmp, os.NewError("Invalid node id specified.")
@@ -233,7 +249,9 @@ func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error) {
 	}
 	return template[0], this.chkStatusCode("gn")
 }
-// GetRelationshipsOnNode(id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
+/*
+GetRelationshipsOnNode(id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
+*/
 func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string) (map[int]NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
@@ -262,8 +280,10 @@ func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string
 	}
 	return template, this.chkStatusCode("gr")
 }
-// SetRelationship(id uint, data map[string]string) returns any errors raised as os.Error
-// id is the relationship id
+/*
+SetRelationship(id uint, data map[string]string) returns any errors raised as os.Error
+id is the relationship id
+*/
 func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
 	this.Method = "put"
 	url := this.BaseURL + "/relationship/"
@@ -277,8 +297,10 @@ func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
 	}
 	return this.chkStatusCode("sr")
 }
-// DelRelationship(id uint) returns any errors raised as os.Error
-// you can pass in more than 1 id
+/*
+DelRelationship(id uint) returns any errors raised as os.Error
+you can pass in more than 1 id
+*/
 func (this *Neo4j) DelRelationship(id ...uint) os.Error {
 	this.Method = "delete"
 	url := this.BaseURL + "/relationship/"
@@ -291,7 +313,9 @@ func (this *Neo4j) DelRelationship(id ...uint) os.Error {
 	}
 	return this.chkStatusCode("dr")
 }
-// CreateRelationship(src node id uint, dst node id uint, data map[string]string, relationship type string) returns any errors raised as os.Error
+/*
+CreateRelationship(src node id uint, dst node id uint, data map[string]string, relationship type string) returns any errors raised as os.Error
+*/
 func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string, rType string) os.Error {
 	dstNode, err := this.GetNode(dst) // find properties for destination node so we can tie it into the relationship
 	if err != nil {
@@ -317,10 +341,12 @@ func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string
 	}
 	return this.chkStatusCode("cr")
 }
-// SearchIdx(key string, value string, query string, category string, index type string) returns array of NeoTemplate structs and any errors raised as os.Error
-// Lucene query lang: http://lucene.apache.org/java/3_1_0/queryparsersyntax.html
-// example query: the_key:the_* AND the_other_key:[1 TO 100]
-// if you specifiy a query, it will not search by key/value and vice versa
+/* 
+SearchIdx(key string, value string, query string, category string, index type string) returns array of NeoTemplate structs and any errors raised as os.Error
+Lucene query lang: http://lucene.apache.org/java/3_1_0/queryparsersyntax.html
+example query: the_key:the_* AND the_other_key:[1 TO 100]
+if you specifiy a query, it will not search by key/value and vice versa
+*/
 func (this *Neo4j) SearchIdx(key string, value string, query string, cat string, idxType string) (map[int]NeoTemplate, os.Error) {
 	url := this.BaseURL + "/index/"
 	if strings.ToLower(idxType) == "relationship" {
@@ -346,7 +372,9 @@ func (this *Neo4j) SearchIdx(key string, value string, query string, cat string,
 	return template, this.chkStatusCode("si")
 }
 
-// CreateIdx(node id uint, key string, value string, category string, index type string) returns any errors raised as os.Error
+/* 
+CreateIdx(node id uint, key string, value string, category string, index type string) returns any errors raised as os.Error
+*/
 func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxType string) os.Error {
 	template, err := this.GetNode(id)
 	if err != nil {
@@ -368,7 +396,9 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 	return err
 }
 
-// Traverse(node id uint, return type string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) returns array of NeoTemplate structs and any errors raised as os.Error
+/*
+Traverse(node id uint, return type string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) returns array of NeoTemplate structs and any errors raised as os.Error
+*/
 func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for destination node so we can tie it into the relationship
 	if err != nil {
@@ -416,7 +446,9 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 	return template, this.chkStatusCode("tr")
 }
 
-// TraversePath(src node id uint, dst node id uint, relationships map[string]string, depth uint, algorithm string, paths bool) returns array of NeoTemplate structs and any errors raised as os.Error
+/* 
+TraversePath(src node id uint, dst node id uint, relationships map[string]string, depth uint, algorithm string, paths bool) returns array of NeoTemplate structs and any errors raised as os.Error
+*/
 func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]string, depth uint, algo string, paths bool) (map[int]NeoTemplate, os.Error) {
 	dstNode, err := this.GetNode(dst) // find properties for destination node so we can tie it into the relationship
 	if err != nil {
