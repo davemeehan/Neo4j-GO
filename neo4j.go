@@ -73,7 +73,7 @@ var Neo *Neo4j
 const escapedChars = `&'<>"*[]: `
 
 /*
-Get Property(id uint, name string) returns string of property value and any error raised as os.Error
+GetProperty(node id uint, name string) returns string of property value and any error raised as os.Error
 */
 func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 	if len(name) < 1 {
@@ -91,7 +91,7 @@ func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 	return body, this.chkStatusCode("gp")
 }
 /*
-GetProperties(id uint)  returns a NeoTemplate struct and any errors raised as os.Error
+GetProperties(node id uint)  returns a NeoTemplate struct and any errors raised as os.Error
 */
 func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 	node, err := this.GetNode(id) // find properties for node
@@ -116,7 +116,7 @@ func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 	return template[0], this.chkStatusCode("gp")
 }
 /*
-SetProperty(id uint, data map[string]string, replace bool) returns any error raised as os.Error
+SetProperty(node id uint, data map[string]string, replace bool) returns any error raised as os.Error
 typically replace should be false unless you wish to drop any other properties *not* specified in the data you sent to SetProperty
 */
 func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os.Error {
@@ -149,7 +149,7 @@ func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os
 	return this.chkStatusCode("sp")
 }
 /*
-CreateProperty(id uint, data map[string]string, replace bool) returns any errors raised as os.Error
+CreateProperty(node id uint, data map[string]string, replace bool) returns any errors raised as os.Error
 typically replace should be false unless you wish to drop any other properties *not* specified in the data you sent to CreateProperty
 */
 func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool) os.Error {
@@ -179,9 +179,9 @@ func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool)
 	return this.chkStatusCode("cp")
 }
 /*
-DelProperty(id uint, s string) returns any errors raised as os.Error
-pass in a id of the node and string as the the name/key of the property to delete
-this should probably be extended to also delete relationship properties as well
+DelProperty(node id uint, s string) returns any errors raised as os.Error
+pass in the id of the node and string as the the name/key of the property to delete
+could be extended to also delete relationship properties as well
 */
 func (this *Neo4j) DelProperty(id uint, s string) os.Error {
 	node, err := this.GetNode(id) // find properties for node
@@ -196,7 +196,7 @@ func (this *Neo4j) DelProperty(id uint, s string) os.Error {
 	return this.chkStatusCode("dp")
 }
 /*
-DelNode(id uint) returns any errors raised as os.Error
+DelNode(node id uint) returns any errors raised as os.Error
 */
 func (this *Neo4j) DelNode(id uint) os.Error {
 	node, err := this.GetNode(id) // find properties for node
@@ -250,7 +250,7 @@ func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error) {
 	return template[0], this.chkStatusCode("gn")
 }
 /*
-GetRelationshipsOnNode(id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
+GetRelationshipsOnNode(node id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
 */
 func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string) (map[int]NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for node
@@ -281,7 +281,7 @@ func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string
 	return template, this.chkStatusCode("gr")
 }
 /*
-SetRelationship(id uint, data map[string]string) returns any errors raised as os.Error
+SetRelationship(relationship id uint, data map[string]string) returns any errors raised as os.Error
 id is the relationship id
 */
 func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
@@ -298,7 +298,7 @@ func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
 	return this.chkStatusCode("sr")
 }
 /*
-DelRelationship(id uint) returns any errors raised as os.Error
+DelRelationship(relationship id uint) returns any errors raised as os.Error
 you can pass in more than 1 id
 */
 func (this *Neo4j) DelRelationship(id ...uint) os.Error {
