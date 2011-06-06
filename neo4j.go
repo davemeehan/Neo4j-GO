@@ -434,7 +434,7 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 	default:
 		returnType = "node"
 	}
-	url := strings.Replace(node.Traverse, "{returnType}", returnType, 1) // neo4j returns the traverse URL with the literal "{returnType}" at the end. annoying..
+	url := strings.Replace(node.Traverse, "{returnType}", returnType, 1) // neo4j returns the traverse URL with the literal "{returnType}" at the end
 	body, err := this.send(url, string(s))
 	if err != nil {
 		return nil, err
