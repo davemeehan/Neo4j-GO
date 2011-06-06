@@ -606,9 +606,9 @@ func (this *Neo4j) chkStatusCode(self string) os.Error {
 }
 // packs string literal into json object structure around variable "varName"
 // data string should already be in json format
-func (this *Neo4j) pack(varName string, data string) ([]byte, os.Error) {
+func (this *Neo4j) pack(name string, data string) ([]byte, os.Error) {
 	buf := new(bytes.Buffer)
-	err := json.Compact(buf, []byte("{ \""+varName+"\": "+data+" } ")) // pkg data into new json string then compact() it onto our empty buffer
+	err := json.Compact(buf, []byte("{ \""+name+"\": "+data+" } ")) // pkg data into new json string then compact() it onto our empty buffer
 	if err != nil {
 		return nil, err
 	}
