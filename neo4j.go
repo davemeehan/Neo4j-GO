@@ -743,7 +743,7 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]NeoTemplate, err os.Erro
 		templateNode map[string]interface{}   // blank interface for json.Unmarshal; used for node lvl data
 		templateSet  []map[string]interface{} // array of blank interfaces for json.Unmarshal
 	)
-	dataSet = make(map[int]NeoTemplate, 0)         // create first node(empty) of dataSet
+	dataSet = make(map[int]NeoTemplate, 0)         // make it ready for elements
 	err = json.Unmarshal([]byte(s), &templateNode) // unmarshal json data into blank interface. the json pkg will populate with the proper data types
 	if err != nil { // fails on multiple results
 		err = json.Unmarshal([]byte(s), &templateSet) // if unable to unmarshal into single template, try an array of templates instead. If that fails, raise an error
