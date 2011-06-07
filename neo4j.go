@@ -113,7 +113,7 @@ func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 	if err != nil {
 		return tmp, err
 	}
-	return template[0], this.chkStatusCode("gp")
+	return *template[0], this.chkStatusCode("gp")
 }
 /*
 SetProperty(node id uint, data map[string]string, replace bool) returns any error raised as os.Error
@@ -228,7 +228,7 @@ func (this *Neo4j) CreateNode(data map[string]string) (tmp NeoTemplate, err os.E
 	if err != nil {
 		return tmp, err
 	}
-	return template[0], this.chkStatusCode("cn") // creating a node returns a single result
+	return *template[0], this.chkStatusCode("cn") // creating a node returns a single result
 }
 /*
 GetNode(id uint) returns a NeoTemplate struct and any errors raised as os.Error
@@ -247,12 +247,12 @@ func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error) {
 	if err != nil {
 		return tmp, err
 	}
-	return template[0], this.chkStatusCode("gn")
+	return *template[0], this.chkStatusCode("gn")
 }
 /*
 GetRelationshipsOnNode(node id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
 */
-func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string) (map[int]NeoTemplate, os.Error) {
+func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string) (map[int]*NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
 		return nil, err
@@ -347,7 +347,7 @@ Lucene query lang: http://lucene.apache.org/java/3_1_0/queryparsersyntax.html
 example query: the_key:the_* AND the_other_key:[1 TO 100]
 if you specifiy a query, it will not search by key/value and vice versa
 */
-func (this *Neo4j) SearchIdx(key string, value string, query string, cat string, idxType string) (map[int]NeoTemplate, os.Error) {
+func (this *Neo4j) SearchIdx(key string, value string, query string, cat string, idxType string) (map[int]*NeoTemplate, os.Error) {
 	url := this.BaseURL + "/index/"
 	if strings.ToLower(idxType) == "relationship" {
 		url += "relationship"
@@ -399,7 +399,7 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 /*
 Traverse(node id uint, return type string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) returns array of NeoTemplate structs and any errors raised as os.Error
 */
-func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]NeoTemplate, os.Error) {
+func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]*NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for destination node
 	if err != nil {
 		return nil, err
@@ -449,7 +449,7 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 /* 
 TraversePath(src node id uint, dst node id uint, relationships map[string]string, depth uint, algorithm string, paths bool) returns array of NeoTemplate structs and any errors raised as os.Error
 */
-func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]string, depth uint, algo string, paths bool) (map[int]NeoTemplate, os.Error) {
+func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]string, depth uint, algo string, paths bool) (map[int]*NeoTemplate, os.Error) {
 	dstNode, err := this.GetNode(dst) // find properties for destination node
 	if err != nil {
 		return nil, err
@@ -738,12 +738,12 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 json.Unmarshal wrapper
 extracts json data into new interface and returns populated array of interfaces and any errors raised
 */
-func (this *Neo4j) unmarshal(s string) (dataSet map[int]NeoTemplate, err os.Error) {
+func (this *Neo4j) unmarshal(s string) (dataSet map[int]*NeoTemplate, err os.Error) {
 	var (
 		templateNode map[string]interface{}   // blank interface for json.Unmarshal; used for node lvl data
 		templateSet  []map[string]interface{} // array of blank interfaces for json.Unmarshal
 	)
-	dataSet = make(map[int]NeoTemplate, 0)         // make it ready for elements
+	dataSet = make(map[int]*NeoTemplate, 0)         // make it ready for elements
 	err = json.Unmarshal([]byte(s), &templateNode) // unmarshal json data into blank interface. the json pkg will populate with the proper data types
 	if err != nil { // fails on multiple results
 		err = json.Unmarshal([]byte(s), &templateSet) // if unable to unmarshal into single template, try an array of templates instead. If that fails, raise an error
@@ -755,14 +755,14 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]NeoTemplate, err os.Erro
 			if err != nil {
 				return nil, err
 			}
-			dataSet[len(dataSet)] = *data // new array element containing data
+			dataSet[len(dataSet)] = data // new array element containing data
 		}
 	} else {
 		template, err := this.unmarshalNode(templateNode)
 		if err != nil {
 			return nil, err
 		}
-		dataSet[0] = *template // just a single result
+		dataSet[0] = template // just a single result
 	}
 	return
 }
