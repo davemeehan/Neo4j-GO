@@ -43,7 +43,7 @@ type Neo4j struct {
 	Errors         map[string]os.Error // holds neo4j error strings
 }
 
-// used when storing data returned from a neo4j
+// used when storing data returned from neo4j
 type NeoTemplate struct {
 	Neo4j
 	ID                  uint
