@@ -93,7 +93,7 @@ func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 /*
 GetProperties(node id uint)  returns a NeoTemplate struct and any errors raised as os.Error
 */
-func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
+func (this *Neo4j) GetProperties(id uint) (tmp *NeoTemplate, err os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
 		return tmp, err
@@ -113,7 +113,7 @@ func (this *Neo4j) GetProperties(id uint) (tmp NeoTemplate, err os.Error) {
 	if err != nil {
 		return tmp, err
 	}
-	return *template[0], this.chkStatusCode("gp")
+	return template[0], this.chkStatusCode("gp")
 }
 /*
 SetProperty(node id uint, data map[string]string, replace bool) returns any error raised as os.Error
@@ -213,7 +213,7 @@ func (this *Neo4j) DelNode(id uint) os.Error {
 /*
 CreateNode(data map[string]string) returns a NeoTemplate struct and any errors raised as os.Error
 */
-func (this *Neo4j) CreateNode(data map[string]string) (tmp NeoTemplate, err os.Error) {
+func (this *Neo4j) CreateNode(data map[string]string) (tmp *NeoTemplate, err os.Error) {
 	s, err := json.Marshal(data) // serialize data for sending to neo4j
 	if err != nil {
 		return tmp, os.NewError("Unable to Marshal Json data")
@@ -228,12 +228,12 @@ func (this *Neo4j) CreateNode(data map[string]string) (tmp NeoTemplate, err os.E
 	if err != nil {
 		return tmp, err
 	}
-	return *template[0], this.chkStatusCode("cn") // creating a node returns a single result
+	return template[0], this.chkStatusCode("cn") // creating a node returns a single result
 }
 /*
 GetNode(id uint) returns a NeoTemplate struct and any errors raised as os.Error
 */
-func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error) {
+func (this *Neo4j) GetNode(id uint) (tmp *NeoTemplate, err os.Error) {
 	if id < 1 {
 		return tmp, os.NewError("Invalid node id specified.")
 	}
@@ -247,7 +247,7 @@ func (this *Neo4j) GetNode(id uint) (tmp NeoTemplate, err os.Error) {
 	if err != nil {
 		return tmp, err
 	}
-	return *template[0], this.chkStatusCode("gn")
+	return template[0], this.chkStatusCode("gn")
 }
 /*
 GetRelationshipsOnNode(node id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
