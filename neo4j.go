@@ -137,7 +137,7 @@ func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os
 	} else {
 		for k, v := range data {
 			k = strings.TrimSpace(k)                                  // strip leading & trailing whitespace from key
-			_, err := this.send(node.Properties+"/"+k, this.quote(v)) // wrap value in double quotes as neo4j expects
+			_, err := this.send(node.Properties+"/"+k, strconv.Quote(v)) // wrap value in double quotes as neo4j expects
 			if err != nil {
 				return err
 			}
@@ -170,7 +170,7 @@ func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool)
 	} else { // if we are keeping the other properties on the node we must pass in new properties 1 at a time
 		for k, v := range data {
 			k = strings.TrimSpace(k)                                  // strip leading & trailing whitespace from key
-			_, err := this.send(node.Properties+"/"+k, this.quote(v)) // wrap value in double quotes as neo4j expects
+			_, err := this.send(node.Properties+"/"+k, strconv.Quote(v)) // wrap value in double quotes as neo4j expects
 			if err != nil {
 				return err
 			}
@@ -392,7 +392,7 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 	}
 	url += "/" + cat + "/" + key + "/" + value + "/"
 	this.Method = "post"
-	_, err = this.send(url, this.quote(self)) // add double quotes around the node url as neo4j expects
+	_, err = this.send(url, strconv.Quote(self)) // add double quotes around the node url as neo4j expects
 	return err
 }
 
@@ -529,9 +529,6 @@ func (this *Neo4j) escape(buf *bytes.Buffer, s string) {
 		i = strings.IndexAny(s, escapedChars)
 	}
 	buf.WriteString(s)
-}
-func (this *Neo4j) quote(s string) string {
-	return "\"" + s + "\""
 }
 // checks the status code of the http response and returns an appropriate error(or not). 
 // We have to switch based on which method is calling this function because certain HTTP status codes have different meanings depending on the specific REST operation.
