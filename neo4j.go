@@ -125,7 +125,7 @@ func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os
 		return err
 	}
 	this.Method = "put"
-	s, err := json.Marshal(data) // serialize data for sending to neo4j
+	s, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool)
 	if err != nil {
 		return err
 	}
-	s, err := json.Marshal(data) // serialize data for sending to neo4j
+	s, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
@@ -214,7 +214,7 @@ func (this *Neo4j) DelNode(id uint) os.Error {
 CreateNode(data map[string]string) returns a NeoTemplate struct and any errors raised as os.Error
 */
 func (this *Neo4j) CreateNode(data map[string]string) (tmp *NeoTemplate, err os.Error) {
-	s, err := json.Marshal(data) // serialize data for sending to neo4j
+	s, err := json.Marshal(data)
 	if err != nil {
 		return tmp, os.NewError("Unable to Marshal Json data")
 	}
@@ -287,7 +287,7 @@ id is the relationship id
 func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
 	this.Method = "put"
 	url := this.BaseURL + "/relationship/"
-	s, err := json.Marshal(data) // serialize data for sending to neo4j
+	s, err := json.Marshal(data)
 	if err != nil {
 		return os.NewError("Unable to Marshal Json data")
 	}
@@ -330,7 +330,7 @@ func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string
 	j["type"] = rType               // type of relationship
 	j["data"] = map[string]string{} // empty array
 	j["data"] = data                // add data to relationship
-	s, err := json.Marshal(j) // serialize data for sending to neo4j
+	s, err := json.Marshal(j)
 	if err != nil {
 		return os.NewError("Unable to Marshal Json data")
 	}
@@ -420,7 +420,7 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 		j["return filter"] = map[string]string{} // empty array
 		j["return filter"] = filter              // like: { "language": "builtin","name": "all" }
 	}
-	s, err := json.Marshal(j) // serialize data for sending to neo4j
+	s, err := json.Marshal(j)
 	if err != nil {
 		return nil, os.NewError("Unable to Marshal Json data")
 	}
@@ -464,7 +464,7 @@ func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]str
 	j["algorithm"] = algo
 	j["relationships"] = map[string]string{} // empty array
 	j["relationships"] = relationships       // specify relationships like type: "KNOWS" direction: "all"
-	s, err := json.Marshal(j)                // serialize data for sending to neo4j
+	s, err := json.Marshal(j)
 	if err != nil {
 		return nil, os.NewError("Unable to Marshal Json data")
 	}
@@ -743,7 +743,7 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]*NeoTemplate, err os.Err
 		templateNode map[string]interface{}   // blank interface for json.Unmarshal; used for node lvl data
 		templateSet  []map[string]interface{} // array of blank interfaces for json.Unmarshal
 	)
-	dataSet = make(map[int]*NeoTemplate, 0)         // make it ready for elements
+	dataSet = make(map[int]*NeoTemplate)         // make it ready for elements
 	err = json.Unmarshal([]byte(s), &templateNode) // unmarshal json data into blank interface. the json pkg will populate with the proper data types
 	if err != nil { // fails on multiple results
 		err = json.Unmarshal([]byte(s), &templateSet) // if unable to unmarshal into single template, try an array of templates instead. If that fails, raise an error
@@ -774,7 +774,7 @@ func init() {
 	Neo.ServerBasePath = "/db/data"
 	Neo.BaseURL = "http://" + Neo.ServerAddr + ":" + Neo.ServerPort + Neo.ServerBasePath
 
-	Neo.Errors = make(map[string]os.Error, 20) // actually create the map so we can store data into it
+	Neo.Errors = make(map[string]os.Error, 20)
 	Neo.Errors["UnknownStatus"] = os.NewError("Unknown Status Code returned.")
 	Neo.Errors["500"] = os.NewError("Fatal Error 500.")
 	Neo.Errors["404"] = os.NewError("Node, Property, Relationship or Index not found")
