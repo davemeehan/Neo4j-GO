@@ -45,7 +45,6 @@ type Neo4j struct {
 
 // used when storing data returned from neo4j
 type NeoTemplate struct {
-	Neo4j
 	ID                  uint
 	Relationships       string
 	RelationshipsOut    string
@@ -66,12 +65,62 @@ type NeoTemplate struct {
 	Nodes               []interface{} // traverse framework
 	TRelationships      []interface{} // traverse framework
 }
-
-var Neo *Neo4j
-
 // what chars to escape of course
 const escapedChars = `&'<>"*[]: `
+func New() (*Neo4j) {
+	n := new(Neo4j)
+	// just some defaults
+	n.ServerAddr = "127.0.0.1"
+	n.ServerPort = "7474"
+	n.ServerBasePath = "/db/data"
+	n.BaseURL = "http://" + n.ServerAddr + ":" + n.ServerPort + n.ServerBasePath
 
+	n.Errors = make(map[string]os.Error, 21)
+	n.Errors["UnknownStatus"] = os.NewError("Unknown Status Code returned.")
+	n.Errors["500"] = os.NewError("Fatal Error 500.")
+	n.Errors["404"] = os.NewError("Node, Property, Relationship or Index not found")
+
+	// traverse
+	n.Errors["TR404"] = os.NewError("Node or path not found.")
+	n.Errors["TR204"] = os.NewError("No suitable path found.")
+
+	// get property errors
+	n.Errors["GP404"] = os.NewError("Node or Property not found.")
+	n.Errors["GP204"] = os.NewError("No properties found.")
+
+	// set property errors
+	n.Errors["SP404"] = os.NewError("Node not found.")
+	n.Errors["SP400"] = os.NewError("Invalid data sent.")
+
+	// delete property errors
+	n.Errors["DP404"] = os.NewError("Node or Property not found.")
+
+	// set property errors
+	n.Errors["SP400"] = os.NewError("Invalid data sent.")
+
+	// create property errors
+	n.Errors["CP404"] = os.NewError("Node or Property not found.")
+	n.Errors["CP400"] = os.NewError("Invalid data sent.")
+
+	// delete node errors
+	n.Errors["DN404"] = os.NewError("Node not found.")
+	n.Errors["DN409"] = os.NewError("Unable to delete node. May still have relationships.")
+
+	// create relationship errors
+	n.Errors["CR404"] = os.NewError("Node or 'to' node not found.")
+	n.Errors["CR400"] = os.NewError("Invalid data sent.")
+
+	// delete relationship errors
+	n.Errors["DR404"] = os.NewError("Relationship not found.")
+
+	// set relationship errors
+	n.Errors["SR404"] = os.NewError("Relationship not found.")
+	n.Errors["SR400"] = os.NewError("Invalid data sent.")
+
+	// get relationship errors
+	n.Errors["GR404"] = os.NewError("Node not found.")
+	return n
+}
 /*
 GetProperty(node id uint, name string) returns string of property value and any error raised as os.Error
 */
@@ -762,58 +811,4 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]*NeoTemplate, err os.Err
 		dataSet[0] = template // just a single result
 	}
 	return
-}
-func init() {
-	// just some defaults
-	Neo = new(Neo4j)
-	Neo.ServerAddr = "127.0.0.1"
-	Neo.ServerPort = "7474"
-	Neo.ServerBasePath = "/db/data"
-	Neo.BaseURL = "http://" + Neo.ServerAddr + ":" + Neo.ServerPort + Neo.ServerBasePath
-
-	Neo.Errors = make(map[string]os.Error, 20)
-	Neo.Errors["UnknownStatus"] = os.NewError("Unknown Status Code returned.")
-	Neo.Errors["500"] = os.NewError("Fatal Error 500.")
-	Neo.Errors["404"] = os.NewError("Node, Property, Relationship or Index not found")
-
-	// traverse
-	Neo.Errors["TR404"] = os.NewError("Node or path not found.")
-	Neo.Errors["TR204"] = os.NewError("No suitable path found.")
-
-	// get property errors
-	Neo.Errors["GP404"] = os.NewError("Node or Property not found.")
-	Neo.Errors["GP204"] = os.NewError("No properties found.")
-
-	// set property errors
-	Neo.Errors["SP404"] = os.NewError("Node not found.")
-	Neo.Errors["SP400"] = os.NewError("Invalid data sent.")
-
-	// delete property errors
-	Neo.Errors["DP404"] = os.NewError("Node or Property not found.")
-
-	// set property errors
-	Neo.Errors["SP400"] = os.NewError("Invalid data sent.")
-
-	// create property errors
-	Neo.Errors["CP404"] = os.NewError("Node or Property not found.")
-	Neo.Errors["CP400"] = os.NewError("Invalid data sent.")
-
-	// delete node errors
-	Neo.Errors["DN404"] = os.NewError("Node not found.")
-	Neo.Errors["DN409"] = os.NewError("Unable to delete node. May still have relationships.")
-
-	// create relationship errors
-	Neo.Errors["CR404"] = os.NewError("Node or 'to' node not found.")
-	Neo.Errors["CR400"] = os.NewError("Invalid data sent.")
-
-	// delete relationship errors
-	Neo.Errors["DR404"] = os.NewError("Relationship not found.")
-
-	// set relationship errors
-	Neo.Errors["SR404"] = os.NewError("Relationship not found.")
-	Neo.Errors["SR400"] = os.NewError("Invalid data sent.")
-
-	// get relationship errors
-	Neo.Errors["GR404"] = os.NewError("Node not found.")
-
 }

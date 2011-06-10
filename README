@@ -49,7 +49,7 @@ import(
 	"log"
 )
 func main() {
-	neo := neo4j.Neo
+	neo := neo4j.New()
 	
 	// these are the defaults set in the init() func
 	neo.ServerAddr = "127.0.0.1"
