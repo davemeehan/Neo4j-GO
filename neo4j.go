@@ -696,7 +696,10 @@ func (this *Neo4j) send(url string, data string) (string, os.Error) {
 	if err != nil {
 		return "", err
 	}
-	buf.ReadFrom(resp.Body)
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		return "", err
+	}
 	resp.Body.Close()
 	this.StatusCode = resp.StatusCode // the calling method should do more inspection with chkStatusCode() method and determine if the operation was successful or not.
 	return buf.String(), nil
