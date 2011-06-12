@@ -262,7 +262,7 @@ func (this *Neo4j) DelNode(id uint) os.Error {
 /*
 CreateNode(data map[string]string) returns a NeoTemplate struct and any errors raised as os.Error
 */
-func (this *Neo4j) CreateNode(data map[string]interface{}) (tmp *NeoTemplate, err os.Error) {
+func (this *Neo4j) CreateNode(data map[string]string) (tmp *NeoTemplate, err os.Error) {
 	s, err := json.Marshal(data)
 	if err != nil {
 		return tmp, os.NewError("Unable to Marshal Json data")
