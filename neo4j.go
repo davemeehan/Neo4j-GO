@@ -696,7 +696,11 @@ func (this *Neo4j) send(url string, data string) (string, os.Error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if resp.Body != nil {
+			resp.Body.Close()
+		}
+	}()
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
 		return "", err
