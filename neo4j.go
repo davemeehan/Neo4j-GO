@@ -54,8 +54,8 @@ type NeoTemplate struct {
 	Properties          string
 	Self                string
 	Extensions          map[string]interface{}
-	Start               string        // relationships & traverse // might have to break into two vars because sometimes neo4j uses "start" to store a string, sometimes it is an object
-	End                 string        // relationships & traverse // might have to break into two vars because sometimes neo4j uses "end" to store a string, sometimes it is an object
+	Start               string        // relationships & traverse // returns both obj & string
+	End                 string        // relationships & traverse // returns both obj & string
 	Type                string        // relationships & traverse
 	Indexed             string        // index related
 	Length              string        // traverse framework
