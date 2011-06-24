@@ -35,11 +35,8 @@ import (
 // general neo4j config
 type Neo4j struct {
 	Method         string // which http method
-	BaseURL        string // probably a combination of the following vars
-	ServerAddr     string
-	ServerPort     string
-	ServerBasePath string
 	StatusCode     int                 // last http status code received
+	URL string
 	Errors         map[string]os.Error // holds neo4j error strings
 }
 
@@ -67,13 +64,12 @@ type NeoTemplate struct {
 }
 // what chars to escape of course
 const escapedChars = `&'<>"*[]: `
-func New() (*Neo4j) {
+func New(u string) (*Neo4j) {
 	n := new(Neo4j)
-	// just some defaults
-	n.ServerAddr = "127.0.0.1"
-	n.ServerPort = "7474"
-	n.ServerBasePath = "/db/data"
-	n.BaseURL = "http://" + n.ServerAddr + ":" + n.ServerPort + n.ServerBasePath
+	n.URL = u
+	if len(u) < 1 {
+		n.URL = "http://127.0.0.1:7474/db/data"	
+	}
 
 	n.Errors = make(map[string]os.Error, 21)
 	n.Errors["UnknownStatus"] = os.NewError("Unknown Status Code returned.")
@@ -268,7 +264,7 @@ func (this *Neo4j) CreateNode(data map[string]string) (tmp *NeoTemplate, err os.
 		return tmp, os.NewError("Unable to Marshal Json data")
 	}
 	this.Method = "post"
-	url := this.BaseURL + "/node"
+	url := this.URL + "/node"
 	body, err := this.send(url, string(s))
 	if err != nil {
 		return tmp, err
@@ -287,7 +283,7 @@ func (this *Neo4j) GetNode(id uint) (tmp *NeoTemplate, err os.Error) {
 		return tmp, os.NewError("Invalid node id specified.")
 	}
 	this.Method = "get"
-	url := this.BaseURL + "/node/"
+	url := this.URL + "/node/"
 	body, err := this.send(url+strconv.Uitoa(id), "") // convert uint -> string and send http request
 	if err != nil {
 		return tmp, err
@@ -335,7 +331,7 @@ id is the relationship id
 */
 func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
 	this.Method = "put"
-	url := this.BaseURL + "/relationship/"
+	url := this.URL + "/relationship/"
 	s, err := json.Marshal(data)
 	if err != nil {
 		return os.NewError("Unable to Marshal Json data")
@@ -352,7 +348,7 @@ you can pass in more than 1 id
 */
 func (this *Neo4j) DelRelationship(id ...uint) os.Error {
 	this.Method = "delete"
-	url := this.BaseURL + "/relationship/"
+	url := this.URL + "/relationship/"
 	for _, i := range id {
 		// delete each relationship for every id passed in
 		_, err := this.send(url+strconv.Uitoa(i), "")
@@ -397,7 +393,7 @@ example query: the_key:the_* AND the_other_key:[1 TO 100]
 if you specifiy a query, it will not search by key/value and vice versa
 */
 func (this *Neo4j) SearchIdx(key string, value string, query string, cat string, idxType string) (map[int]*NeoTemplate, os.Error) {
-	url := this.BaseURL + "/index/"
+	url := this.URL + "/index/"
 	if strings.ToLower(idxType) == "relationship" {
 		url += "relationship"
 	} else {
@@ -406,7 +402,7 @@ func (this *Neo4j) SearchIdx(key string, value string, query string, cat string,
 	url += "/" + cat
 	if len(query) > 0 { // query set, ignore key/value pair
 		url += "?query=" + this.EscapeString(query)
-	} else { // default option, search key, val
+	} else { // search key, val
 		url += "/" + strings.TrimSpace(key) + "/" + this.EscapeString(value)
 	}
 	this.Method = "get"
@@ -433,7 +429,7 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 		idxType = "idx_nodes" // default, generic, index type
 	}
 	self := template.Self
-	url := this.BaseURL + "/index/"
+	url := this.URL + "/index/"
 	if strings.ToLower(idxType) == "relationship" {
 		url += "relationship"
 	} else {
@@ -667,7 +663,7 @@ func (this *Neo4j) send(url string, data string) (string, os.Error) {
 		err  os.Error
 	)
 	if len(url) < 1 {
-		url = this.BaseURL + "node" // default path
+		url = this.URL + "node" // default path
 	}
 	client := new(http.Client)
 	switch strings.ToLower(this.Method) { // which http method

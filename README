@@ -49,13 +49,7 @@ import(
 	"log"
 )
 func main() {
-	neo := neo4j.New()
-	
-	// these next 3 vars are the defaults set by neo4j.New()
-	neo.ServerAddr = "127.0.0.1"
-	neo.ServerPort = "7474"
-	neo.ServerBasePath = "/db/data"
-	
+	neo = neo4j.New("http://localhost:7474/db/data")
 	node := map[string]string { 
 		"test1" : "foo", 
 		"test2" : "bar",
