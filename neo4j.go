@@ -67,11 +67,11 @@ const escapedChars = `&'<>"*[]: `
 
 func New(u string) *Neo4j {
 	n := new(Neo4j)
-	n.URL = u
 	if len(u) < 1 {
-		n.URL = "http://127.0.0.1:7474/db/data"
+		u = "http://127.0.0.1:7474/db/data"
 	}
-
+	n.URL = u
+	
 	n.Errors = make(map[string]os.Error, 21)
 	n.Errors["UnknownStatus"] = os.NewError("Unknown Status Code returned.")
 	n.Errors["500"] = os.NewError("Fatal Error 500.")
