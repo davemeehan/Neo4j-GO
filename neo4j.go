@@ -142,22 +142,22 @@ GetProperties(node id uint)  returns a NeoTemplate struct and any errors raised 
 func (this *Neo4j) GetProperties(id uint) (tmp *NeoTemplate, err os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return tmp, err
+		return
 	}
 	this.Method = "get"
 	body, err := this.send(node.Properties, "")
 	if err != nil {
-		return tmp, err
+		return
 	}
 	// pack json string into variable "data" so the json unmarshaler knows where to put it on struct type NeoTemplate
 	jsonData, err := this.pack("data", body)
 	if err != nil {
-		return tmp, err
+		return
 	}
 	//convert json -> string and unmarshal -> NeoTemplate
 	template, err := this.unmarshal(string(jsonData))
 	if err != nil {
-		return tmp, err
+		return
 	}
 	return template[0], this.chkStatusCode("gp")
 }
@@ -330,7 +330,7 @@ func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string
 SetRelationship(relationship id uint, data map[string]string) returns any errors raised as os.Error
 id is the relationship id
 */
-func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
+func (this *Neo4j) SetRelationship(id uint, data map[string]string) (os.Error) {
 	this.Method = "put"
 	url := this.URL + "/relationship/"
 	s, err := json.Marshal(data)
@@ -362,7 +362,7 @@ func (this *Neo4j) DelRelationship(id ...uint) os.Error {
 /*
 CreateRelationship(src node id uint, dst node id uint, data map[string]string, relationship type string) returns any errors raised as os.Error
 */
-func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string, rType string) os.Error {
+func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string, rType string) (os.Error) {
 	dstNode, err := this.GetNode(dst) // find properties for destination node so we can tie it into the relationship
 	if err != nil {
 		return err
@@ -421,7 +421,7 @@ func (this *Neo4j) SearchIdx(key string, value string, query string, cat string,
 /* 
 CreateIdx(node id uint, key string, value string, category string, index type string) returns any errors raised as os.Error
 */
-func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxType string) os.Error {
+func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxType string) (os.Error) {
 	template, err := this.GetNode(id)
 	if err != nil {
 		return err
@@ -532,7 +532,7 @@ func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]str
 	return template, this.chkStatusCode("tr")
 }
 /* shamelessly taken from golang html pkg */
-func (this *Neo4j) EscapeString(s string) string {
+func (this *Neo4j) EscapeString(s string) (string) {
 	if strings.IndexAny(s, escapedChars) == -1 {
 		return s
 	}
@@ -578,7 +578,7 @@ func (this *Neo4j) escape(buf *bytes.Buffer, s string) {
 }
 // checks the status code of the http response and returns an appropriate error(or not). 
 // We have to switch based on which method is calling this function because certain HTTP status codes have different meanings depending on the specific REST operation.
-func (this *Neo4j) chkStatusCode(self string) os.Error {
+func (this *Neo4j) chkStatusCode(self string) (os.Error) {
 	switch this.StatusCode {
 	case 500: // fatal error for sure
 		return this.Errors["500"]
