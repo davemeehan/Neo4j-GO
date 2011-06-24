@@ -34,10 +34,10 @@ import (
 
 // general neo4j config
 type Neo4j struct {
-	Method         string // which http method
-	StatusCode     int                 // last http status code received
-	URL string
-	Errors         map[string]os.Error // holds neo4j error strings
+	Method     string // which http method
+	StatusCode int    // last http status code received
+	URL        string
+	Errors     map[string]os.Error // holds neo4j error strings
 }
 
 // used when storing data returned from neo4j
@@ -64,11 +64,12 @@ type NeoTemplate struct {
 }
 // what chars to escape of course
 const escapedChars = `&'<>"*[]: `
-func New(u string) (*Neo4j) {
+
+func New(u string) *Neo4j {
 	n := new(Neo4j)
 	n.URL = u
 	if len(u) < 1 {
-		n.URL = "http://127.0.0.1:7474/db/data"	
+		n.URL = "http://127.0.0.1:7474/db/data"
 	}
 
 	n.Errors = make(map[string]os.Error, 21)
@@ -181,7 +182,7 @@ func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os
 		}
 	} else {
 		for k, v := range data {
-			k = strings.TrimSpace(k)                                  // strip leading & trailing whitespace from key
+			k = strings.TrimSpace(k)                                     // strip leading & trailing whitespace from key
 			_, err := this.send(node.Properties+"/"+k, strconv.Quote(v)) // wrap value in double quotes as neo4j expects
 			if err != nil {
 				return err
@@ -214,7 +215,7 @@ func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool)
 		}
 	} else { // if we are keeping the other properties on the node we must pass in new properties 1 at a time
 		for k, v := range data {
-			k = strings.TrimSpace(k)                                  // strip leading & trailing whitespace from key
+			k = strings.TrimSpace(k)                                     // strip leading & trailing whitespace from key
 			_, err := this.send(node.Properties+"/"+k, strconv.Quote(v)) // wrap value in double quotes as neo4j expects
 			if err != nil {
 				return err
@@ -792,9 +793,9 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]*NeoTemplate, err os.Err
 		templateNode map[string]interface{}   // blank interface for json.Unmarshal; used for node lvl data
 		templateSet  []map[string]interface{} // array of blank interfaces for json.Unmarshal
 	)
-	dataSet = make(map[int]*NeoTemplate)         // make it ready for elements
+	dataSet = make(map[int]*NeoTemplate)           // make it ready for elements
 	err = json.Unmarshal([]byte(s), &templateNode) // unmarshal json data into blank interface. the json pkg will populate with the proper data types
-	if err != nil { // fails on multiple results
+	if err != nil {                                // fails on multiple results
 		err = json.Unmarshal([]byte(s), &templateSet) // if unable to unmarshal into single template, try an array of templates instead. If that fails, raise an error
 		if err != nil {
 			return nil, err
