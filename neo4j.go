@@ -63,7 +63,7 @@ type NeoTemplate struct {
 	TRelationships      []interface{} // traverse framework
 }
 // what chars to escape of course
-const escapedChars = `&'<>"*[]: `
+const escapedChars = `&'<>"*[]:% `
 
 func New(u string) *Neo4j {
 	n := new(Neo4j)
@@ -547,6 +547,8 @@ func (this *Neo4j) escape(buf *bytes.Buffer, s string) {
 		buf.WriteString(s[0:i])
 		var esc string
 		switch s[i] {
+		case '%':
+			esc = "%25"
 		case '&':
 			esc = "&amp;"
 		case '\'':
