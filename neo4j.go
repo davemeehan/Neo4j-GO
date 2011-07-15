@@ -37,7 +37,6 @@ type Neo4j struct {
 	Method     string // which http method
 	StatusCode int    // last http status code received
 	URL        string
-	Errors     map[string]os.Error // holds neo4j error strings
 }
 type Error struct {
 	List map[int]os.Error
