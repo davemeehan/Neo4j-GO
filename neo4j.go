@@ -592,7 +592,6 @@ func (this *Neo4j) escape(buf *bytes.Buffer, s string) {
 	buf.WriteString(s)
 }
 // checks the status code of the http response and returns an appropriate error(or not). 
-// We have to switch based on which method is calling this function because certain HTTP status codes have different meanings depending on the specific REST operation.
 func (this *Error) Check() os.Error {
 	if this.List != nil {
 		if this.List[this.Code] != nil {
