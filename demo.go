@@ -6,8 +6,11 @@ import (
 )
 
 func main() {
-	neo := neo4j.New("http://localhost:7474/db/data")
-
+	neo, err := neo4j.NewNeo4j("http://localhost:7474/db/data")
+	if err != nil {
+		log.Printf("%v\n",err)
+		return
+	}
 	node := map[string]string{
 		"test1": "foo",
 		"test2": "bar",
@@ -20,7 +23,7 @@ func main() {
 	data, _ = neo.GetNode(self)
 	log.Printf("\nNode data: %v\n", data)
 
-	err := neo.DelProperty(self, "test1")
+	err = neo.DelProperty((self+5000), "test1") // will trigger an error unless you have over 5000 nodes in your db
 	if err != nil {
 		log.Printf("Del Property failed with: %v\n", err)
 	} else {
@@ -57,7 +60,7 @@ func main() {
 		"test3": "foobar",
 	}
 	/* id(uint), data map[string]string, replace bool (remove properties not specified?) */
-	err = neo.SetProperty(self, pdata, false)
+	err = neo.SetProperty(1, pdata, false)
 	if err != nil {
 		log.Printf("Set Prop failed with: %v\n", err)
 	} else {
