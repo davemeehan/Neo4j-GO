@@ -389,7 +389,6 @@ func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string
 		400: os.NewError("Invalid data sent."),
 	}
 	return this.NewError(errorList, nil)
-	//return this.chkStatusCode("cr")
 }
 /* 
 SearchIdx(key string, value string, query string, category string, index type string) returns array of NeoTemplate structs and any errors raised as os.Error
@@ -451,7 +450,6 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 	}
 	return this.NewError(errorList, nil)
 }
-
 /*
 Traverse(node id uint, return type string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) returns array of NeoTemplate structs and any errors raised as os.Error
 */
