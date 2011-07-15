@@ -592,7 +592,7 @@ func (this *Neo4j) escape(buf *bytes.Buffer, s string) {
 	buf.WriteString(s)
 }
 // checks the status code of the http response and returns an appropriate error(or not). 
-func (this *Error) Check() os.Error {
+func (this *Error) check() os.Error {
 	if this.List != nil {
 		if this.List[this.Code] != nil {
 			this.Msg = this.List[this.Code]
@@ -780,9 +780,9 @@ func (this *Neo4j) NewError(errorList map[int]os.Error, msg os.Error) os.Error {
 	if errorList != nil {
 		errorList[500] = os.NewError("Fatal Error 500.") // everything can return a 500 error
 	}
-	iserr := &Error{errorList, this.StatusCode, msg}
+	err := &Error{errorList, this.StatusCode, msg}
 	if msg != nil {
 		return msg
 	}
-	return iserr.Check()
+	return err.check()
 }
