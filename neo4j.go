@@ -41,7 +41,6 @@ type Neo4j struct {
 type Error struct {
 	List map[int]os.Error
 	Code int
-	Msg  os.Error // used for general errors
 }
 // used when storing data returned from neo4j
 type NeoTemplate struct {
@@ -82,22 +81,22 @@ GetProperty(node id uint, name string) returns string of property value and any 
 */
 func (this *Neo4j) GetProperty(id uint, name string) (string, os.Error) {
 	if len(name) < 1 {
-		return "", this.NewError(nil, os.NewError("Property name must be at least 1 character."))
+		return "", os.NewError("Property name must be at least 1 character.")
 	}
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return "", this.NewError(nil, err)
+		return "", err
 	}
 	this.Method = "get"
 	body, err := this.send(node.Properties+"/"+name, "")
 	if err != nil {
-		return "", this.NewError(nil, err)
+		return "", err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node or Property not found."),
 		204: os.NewError("No properties found."),
 	}
-	return body, this.NewError(errorList, nil)
+	return body, this.NewError(errorList)
 }
 /*
 GetProperties(node id uint)  returns a NeoTemplate struct and any errors raised as os.Error
@@ -105,28 +104,28 @@ GetProperties(node id uint)  returns a NeoTemplate struct and any errors raised 
 func (this *Neo4j) GetProperties(id uint) (tmp *NeoTemplate, err os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	this.Method = "get"
 	body, err := this.send(node.Properties, "")
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	// pack json string into variable "data" so the json unmarshaler knows where to put it on struct type NeoTemplate
 	jsonData, err := this.pack("data", body)
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	//convert json -> string and unmarshal -> NeoTemplate
 	template, err := this.unmarshal(string(jsonData))
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node or Property not found."),
 		204: os.NewError("No properties found."),
 	}
-	return template[0], this.NewError(errorList, nil)
+	return template[0], this.NewError(errorList)
 }
 /*
 SetProperty(node id uint, data map[string]string, replace bool) returns any error raised as os.Error
@@ -135,35 +134,35 @@ typically replace should be false unless you wish to drop any other properties *
 func (this *Neo4j) SetProperty(id uint, data map[string]string, replace bool) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	this.Method = "put"
 	s, err := json.Marshal(data)
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	if replace { // drop all properties on the node if they aren't specified in "data" ?
 		_, err := this.send(node.Properties, string(s))
 		if err != nil {
-			return this.NewError(nil, err)
+			return err
 		}
 	} else {
 		for k, v := range data {
 			k = strings.TrimSpace(k)                                     // strip leading & trailing whitespace from key
 			_, err := this.send(node.Properties+"/"+k, strconv.Quote(v)) // wrap value in double quotes as neo4j expects
 			if err != nil {
-				return this.NewError(nil, err)
+				return err
 			}
 		}
 	}
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node not found."),
 		400: os.NewError("Invalid data sent."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 CreateProperty(node id uint, data map[string]string, replace bool) returns any errors raised as os.Error
@@ -172,24 +171,24 @@ typically replace should be false unless you wish to drop any other properties *
 func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	s, err := json.Marshal(data)
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	this.Method = "put"
 	if replace { // when replacing and dropping *ALL* values on node(not just new ones) we can simply pass in the entire json data set and neo4j will remove the old properties
 		_, err := this.send(node.Properties, string(s))
 		if err != nil {
-			return this.NewError(nil, err)
+			return err
 		}
 	} else { // if we are keeping the other properties on the node we must pass in new properties 1 at a time
 		for k, v := range data {
 			k = strings.TrimSpace(k)                                     // strip leading & trailing whitespace from key
 			_, err := this.send(node.Properties+"/"+k, strconv.Quote(v)) // wrap value in double quotes as neo4j expects
 			if err != nil {
-				return this.NewError(nil, err)
+				return err
 			}
 		}
 	}
@@ -197,7 +196,7 @@ func (this *Neo4j) CreateProperty(id uint, data map[string]string, replace bool)
 		404: os.NewError("Node or Property not found."),
 		400: os.NewError("Invalid data sent."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 DelProperty(node id uint, s string) returns any errors raised as os.Error
@@ -207,17 +206,17 @@ could be extended to also delete relationship properties as well
 func (this *Neo4j) DelProperty(id uint, s string) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	this.Method = "delete"
 	_, err = this.send(node.Properties+"/"+string(s), "")
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node or Property not found."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 DelNode(node id uint) returns any errors raised as os.Error
@@ -225,18 +224,18 @@ DelNode(node id uint) returns any errors raised as os.Error
 func (this *Neo4j) DelNode(id uint) os.Error {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	this.Method = "delete"
 	_, err = this.send(node.Self, "")
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node not found."),
 		409: os.NewError("Unable to delete node. May still have relationships."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 CreateNode(data map[string]string) returns a NeoTemplate struct and any errors raised as os.Error
@@ -244,44 +243,44 @@ CreateNode(data map[string]string) returns a NeoTemplate struct and any errors r
 func (this *Neo4j) CreateNode(data map[string]string) (tmp *NeoTemplate, err os.Error) {
 	s, err := json.Marshal(data)
 	if err != nil {
-		return tmp, this.NewError(nil, os.NewError("Unable to Marshal Json data"))
+		return tmp, os.NewError("Unable to Marshal Json data")
 	}
 	this.Method = "post"
 	url := this.URL + "/node"
 	body, err := this.send(url, string(s))
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	template, err := this.unmarshal(body) // json.Unmarshal wrapper with some type assertions etc
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	errorList := map[int]os.Error{
 		400: os.NewError("Invalid data sent."),
 	}
-	return template[0], this.NewError(errorList, nil)
+	return template[0], this.NewError(errorList)
 }
 /*
 GetNode(id uint) returns a NeoTemplate struct and any errors raised as os.Error
 */
 func (this *Neo4j) GetNode(id uint) (tmp *NeoTemplate, err os.Error) {
 	if id < 1 {
-		return tmp, this.NewError(nil, os.NewError("Invalid node id specified."))
+		return tmp, os.NewError("Invalid node id specified.")
 	}
 	this.Method = "get"
 	url := this.URL + "/node/"
 	body, err := this.send(url+strconv.Uitoa(id), "") // convert uint -> string and send http request
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	template, err := this.unmarshal(body) // json.Unmarshal wrapper with some type assertions etc
 	if err != nil {
-		return tmp, this.NewError(nil, err)
+		return tmp, err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node not found."),
 	}
-	return template[0], this.NewError(errorList, nil)
+	return template[0], this.NewError(errorList)
 }
 /*
 GetRelationshipsOnNode(node id uint, name string, direction string) returns an array of NeoTemplate structs containing relationship data and any errors raised as os.Error
@@ -289,7 +288,7 @@ GetRelationshipsOnNode(node id uint, name string, direction string) returns an a
 func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string) (map[int]*NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for node
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	this.Method = "get"
 	direction = strings.ToLower(direction)
@@ -306,16 +305,16 @@ func (this *Neo4j) GetRelationshipsOnNode(id uint, name string, direction string
 	}
 	body, err := this.send(url+"/"+name, "")
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	template, err := this.unmarshal(body)
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node not found."),
 	}
-	return template, this.NewError(errorList, nil)
+	return template, this.NewError(errorList)
 }
 /*
 SetRelationship(relationship id uint, data map[string]string) returns any errors raised as os.Error
@@ -326,17 +325,17 @@ func (this *Neo4j) SetRelationship(id uint, data map[string]string) os.Error {
 	url := this.URL + "/relationship/"
 	s, err := json.Marshal(data)
 	if err != nil {
-		return this.NewError(nil, os.NewError("Unable to Marshal Json data"))
+		return os.NewError("Unable to Marshal Json data")
 	}
 	_, err = this.send(url+strconv.Uitoa(id)+"/properties", string(s))
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Relationship not found."),
 		400: os.NewError("Invalid data sent."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 DelRelationship(relationship id uint) returns any errors raised as os.Error
@@ -349,13 +348,13 @@ func (this *Neo4j) DelRelationship(id ...uint) os.Error {
 		// delete each relationship for every id passed in
 		_, err := this.send(url+strconv.Uitoa(i), "")
 		if err != nil {
-			return this.NewError(nil, err)
+			return err
 		}
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Relationship not found."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 CreateRelationship(src node id uint, dst node id uint, data map[string]string, relationship type string) returns any errors raised as os.Error
@@ -363,11 +362,11 @@ CreateRelationship(src node id uint, dst node id uint, data map[string]string, r
 func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string, rType string) os.Error {
 	dstNode, err := this.GetNode(dst) // find properties for destination node so we can tie it into the relationship
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	srcNode, err := this.GetNode(src) // find properties for src node..
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	j := map[string]interface{}{} // empty map: keys are always strings in json, values vary
 	j["to"] = dstNode.Self
@@ -376,18 +375,18 @@ func (this *Neo4j) CreateRelationship(src uint, dst uint, data map[string]string
 	j["data"] = data                // add data to relationship
 	s, err := json.Marshal(j)
 	if err != nil {
-		return this.NewError(nil, os.NewError("Unable to Marshal Json data"))
+		return os.NewError("Unable to Marshal Json data")
 	}
 	this.Method = "post"
 	_, err = this.send(srcNode.RelationshipsCreate, string(s)) // srcNode.RelationshipsCreate actually contains the full URL
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node or 'to' node not found."),
 		400: os.NewError("Invalid data sent."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /* 
 SearchIdx(key string, value string, query string, category string, index type string) returns array of NeoTemplate structs and any errors raised as os.Error
@@ -411,16 +410,16 @@ func (this *Neo4j) SearchIdx(key string, value string, query string, cat string,
 	this.Method = "get"
 	body, err := this.send(url, "")
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	template, err := this.unmarshal(body)
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	errorList := map[int]os.Error{
 		400: os.NewError("Invalid data sent."),
 	}
-	return template, this.NewError(errorList, nil)
+	return template, this.NewError(errorList)
 }
 
 /* 
@@ -429,7 +428,7 @@ CreateIdx(node id uint, key string, value string, category string, index type st
 func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxType string) os.Error {
 	template, err := this.GetNode(id)
 	if err != nil {
-		return this.NewError(nil, err)
+		return err
 	}
 	if len(cat) < 1 {
 		idxType = "idx_nodes" // default, generic, index type
@@ -447,7 +446,7 @@ func (this *Neo4j) CreateIdx(id uint, key string, value string, cat string, idxT
 	errorList := map[int]os.Error{
 		400: os.NewError("Invalid data sent."),
 	}
-	return this.NewError(errorList, nil)
+	return this.NewError(errorList)
 }
 /*
 Traverse(node id uint, return type string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) returns array of NeoTemplate structs and any errors raised as os.Error
@@ -455,7 +454,7 @@ Traverse(node id uint, return type string, order string, uniqueness string, rela
 func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]*NeoTemplate, os.Error) {
 	node, err := this.GetNode(id) // find properties for destination node
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	j := map[string]interface{}{} // empty map: keys are always strings in json, values vary
 	j["order"] = order
@@ -475,7 +474,7 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 	}
 	s, err := json.Marshal(j)
 	if err != nil {
-		return nil, this.NewError(nil, os.NewError("Unable to Marshal Json data"))
+		return nil, os.NewError("Unable to Marshal Json data")
 	}
 	this.Method = "post"
 	returnType = strings.ToLower(returnType)
@@ -490,16 +489,16 @@ func (this *Neo4j) Traverse(id uint, returnType string, order string, uniqueness
 	url := strings.Replace(node.Traverse, "{returnType}", returnType, 1) // neo4j returns the traverse URL with the literal "{returnType}" at the end
 	body, err := this.send(url, string(s))
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	template, err := this.unmarshal(body)
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("Node not found."),
 	}
-	return template, this.NewError(errorList, nil)
+	return template, this.NewError(errorList)
 }
 
 /* 
@@ -508,11 +507,11 @@ TraversePath(src node id uint, dst node id uint, relationships map[string]string
 func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]string, depth uint, algo string, paths bool) (map[int]*NeoTemplate, os.Error) {
 	dstNode, err := this.GetNode(dst) // find properties for destination node
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	srcNode, err := this.GetNode(src) // find properties for src node..
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	j := map[string]interface{}{} // empty map: keys are always strings in json, values vary
 	j["to"] = dstNode.Self
@@ -522,7 +521,7 @@ func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]str
 	j["relationships"] = relationships       // specify relationships like type: "KNOWS" direction: "all"
 	s, err := json.Marshal(j)
 	if err != nil {
-		return nil, this.NewError(nil, os.NewError("Unable to Marshal Json data"))
+		return nil, os.NewError("Unable to Marshal Json data")
 	}
 	this.Method = "post"
 	url := srcNode.Self
@@ -533,16 +532,16 @@ func (this *Neo4j) TraversePath(src uint, dst uint, relationships map[string]str
 	}
 	body, err := this.send(url, string(s))
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	template, err := this.unmarshal(body)
 	if err != nil {
-		return nil, this.NewError(nil, err)
+		return nil, err
 	}
 	errorList := map[int]os.Error{
 		404: os.NewError("No path found using current algorithm and parameters"),
 	}
-	return template, this.NewError(errorList, nil)
+	return template, this.NewError(errorList)
 }
 /* shamelessly taken from golang html pkg */
 func (this *Neo4j) EscapeString(s string) string {
@@ -590,16 +589,6 @@ func (this *Neo4j) escape(buf *bytes.Buffer, s string) {
 		i = strings.IndexAny(s, escapedChars)
 	}
 	buf.WriteString(s)
-}
-// checks the status code of the http response and returns an appropriate error(or not). 
-func (this *Error) check() os.Error {
-	if this.List != nil {
-		if this.List[this.Code] != nil {
-			this.Msg = this.List[this.Code]
-			return this.List[this.Code]
-		}
-	}
-	return nil // if error exists it was not defined in Error.List
 }
 // packs string literal into json object structure around variable "varName"
 // data string should already be in json format
@@ -770,19 +759,19 @@ func (this *Neo4j) unmarshal(s string) (dataSet map[int]*NeoTemplate, err os.Err
 	}
 	return
 }
-func (this *Error) String() string {
-	if this.Msg != nil {
-		return this.Msg.String()
-	}
-	return ""
-}
-func (this *Neo4j) NewError(errorList map[int]os.Error, msg os.Error) os.Error {
+func (this *Neo4j) NewError(errorList map[int]os.Error) os.Error {
 	if errorList != nil {
 		errorList[500] = os.NewError("Fatal Error 500.") // everything can return a 500 error
 	}
-	err := &Error{errorList, this.StatusCode, msg}
-	if msg != nil {
-		return msg
-	}
+	err := &Error{errorList, this.StatusCode}
 	return err.check()
+}
+// checks the status code of the http response and returns an appropriate error(or not). 
+func (this *Error) check() os.Error {
+	if this.List != nil {
+		if this.List[this.Code] != nil {
+			return this.List[this.Code]
+		}
+	}
+	return nil // if error exists it was not defined in Error.List
 }
