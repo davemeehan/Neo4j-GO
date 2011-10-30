@@ -626,9 +626,6 @@ func (this *Neo4j) send(url string, data string) (string, os.Error) {
 		)
 	case "put":
 		body := strings.NewReader(data)
-		if err != nil {
-			return "", os.NewError("Unable to Marshal Json data")
-		}
 		req, e := http.NewRequest("PUT", url, body)
 		if e != nil {
 			err = e
