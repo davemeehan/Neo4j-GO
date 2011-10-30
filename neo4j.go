@@ -612,7 +612,12 @@ func (this *Neo4j) send(url string, data string) (string, os.Error) {
 	client := new(http.Client)
 	switch strings.ToLower(this.Method) { // which http method
 	case "delete":
-		resp, err = client.Delete(url)
+		req, e := http.NewRequest("DELETE", url, nil)
+		if e != nil {
+			err = e
+			break
+		}
+		resp, err = client.Do(req)
 	case "post":
 		body := strings.NewReader(data)
 		resp, err = client.Post(url,
@@ -624,14 +629,17 @@ func (this *Neo4j) send(url string, data string) (string, os.Error) {
 		if err != nil {
 			return "", os.NewError("Unable to Marshal Json data")
 		}
-		resp, err = client.Put(url,
-			"application/json",
-			body,
-		)
+		req, e := http.NewRequest("PUT", url, body)
+		if e != nil {
+			err = e
+			break
+		}
+		req.Header.Set("Content-Type", "application/json")
+		resp, err = client.Do(req)
 	case "get":
 		fallthrough
 	default:
-		resp, _, err = client.Get(url)
+		resp, err = client.Get(url)
 	}
 	if err != nil {
 		return "", err
@@ -690,7 +698,7 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 					case "self":
 						node.Self, _ = data.(string) // cast it to a string with type assertion
 						// "self" provides easy access to the ID property of the node(relationship, index,etc), we'll take advantage and axe it off right now
-						selfSlice := strings.Split(string(node.Self), "/", -1)     // slice string "Self" on each '/' char, -1 gets all instances
+						selfSlice := strings.Split(string(node.Self), "/")     // slice string "Self" on each '/' char, -1 gets all instances
 						id, atouiErr := strconv.Atoui(selfSlice[len(selfSlice)-1]) // and pull off the last part which is the ID then string -> uint
 						if atouiErr != nil {
 							return nil, atouiErr
