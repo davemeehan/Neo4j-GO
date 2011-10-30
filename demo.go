@@ -8,7 +8,7 @@ import (
 func main() {
 	neo, err := neo4j.NewNeo4j("http://localhost:7474/db/data")
 	if err != nil {
-		log.Printf("%v\n",err)
+		log.Printf("%v\n", err)
 		return
 	}
 	node := map[string]string{
@@ -23,7 +23,7 @@ func main() {
 	data, _ = neo.GetNode(self)
 	log.Printf("\nNode data: %v\n", data)
 
-	err = neo.DelProperty((self+5000), "test1") // will trigger an error unless you have over 5000 nodes in your db
+	err = neo.DelProperty((self + 5000), "test1") // will trigger an error unless you have over 5000 nodes in your db
 	if err != nil {
 		log.Printf("Del Property failed with: %v\n", err)
 	} else {

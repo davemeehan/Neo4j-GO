@@ -698,7 +698,7 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 					case "self":
 						node.Self, _ = data.(string) // cast it to a string with type assertion
 						// "self" provides easy access to the ID property of the node(relationship, index,etc), we'll take advantage and axe it off right now
-						selfSlice := strings.Split(string(node.Self), "/")     // slice string "Self" on each '/' char, -1 gets all instances
+						selfSlice := strings.Split(string(node.Self), "/")         // slice string "Self" on each '/' char, -1 gets all instances
 						id, atouiErr := strconv.Atoui(selfSlice[len(selfSlice)-1]) // and pull off the last part which is the ID then string -> uint
 						if atouiErr != nil {
 							return nil, atouiErr
