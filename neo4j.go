@@ -23,10 +23,10 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 package neo4j
 
 import (
-	"http"
+	"net/http"
 	"log"
 	"os"
-	"json"
+	"encoding/json"
 	"strings"
 	"bytes"
 	"strconv"
