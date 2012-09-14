@@ -37,6 +37,8 @@ type Neo4j struct {
 	Method     string // which http method
 	StatusCode int    // last http status code received
 	URL        string
+	Username   string
+	Password   string
 }
 type Error struct {
 	List map[int]error
@@ -67,11 +69,18 @@ type NeoTemplate struct {
 // what chars to escape of course
 const escapedChars = `&'<>"*[]:% `
 
-func NewNeo4j(u string) (*Neo4j, error) {
+func NewNeo4j(u string, user string, passwd string) (*Neo4j, error) {
 	n := new(Neo4j)
 	if len(u) < 1 {
 		u = "http://127.0.0.1:7474/db/data"
 	}
+	if len(user) > 0 {
+                n.Username = user
+        }
+        if len(passwd) > 0 {
+                n.Password = passwd
+        }
+
 	n.URL = u
 	_, err := n.send(u, "") // just a test to see if the connection is valid
 	return n, err
@@ -636,7 +645,14 @@ func (this *Neo4j) send(url string, data string) (string, error) {
 	case "get":
 		fallthrough
 	default:
-		resp, err = client.Get(url)
+		req, e := http.NewRequest("GET", url, nil)
+                if e != nil {
+                        err = e
+                        break
+                }
+                req.SetBasicAuth(this.Username, this.Password)
+                resp, err = client.Get(req)
+
 	}
 	if err != nil {
 		return "", err
