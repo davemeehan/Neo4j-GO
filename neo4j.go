@@ -626,13 +626,18 @@ func (this *Neo4j) send(url string, data string) (string, error) {
 			err = e
 			break
 		}
+		this.setAuth(*req)
 		resp, err = client.Do(req)
 	case "post":
 		body := strings.NewReader(data)
-		resp, err = client.Post(url,
-			"application/json",
-			body,
-		)
+		req, e := http.NewRequest("POST", url, body)
+		if e != nil {
+			err = e
+			break
+		}
+		req.Header.Set("Content-Type", "application/json")
+		this.setAuth(*req)
+		resp, err = client.Do(req)
 	case "put":
 		body := strings.NewReader(data)
 		req, e := http.NewRequest("PUT", url, body)
@@ -641,6 +646,7 @@ func (this *Neo4j) send(url string, data string) (string, error) {
 			break
 		}
 		req.Header.Set("Content-Type", "application/json")
+		this.setAuth(*req)
 		resp, err = client.Do(req)
 	case "get":
 		fallthrough
@@ -669,6 +675,7 @@ func (this *Neo4j) send(url string, data string) (string, error) {
 	this.StatusCode = resp.StatusCode // the calling method should do more inspection with chkStatusCode() method and determine if the operation was successful or not.
 	return buf.String(), nil
 }
+// sets Basic HTTP Auth
 func (this *Neo4j) setAuth(req http.Request) {
 	if len(this.Username) > 0 || len(this.Password) > 0 {
         	req.SetBasicAuth(this.Username, this.Password)
