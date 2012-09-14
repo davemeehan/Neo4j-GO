@@ -269,7 +269,7 @@ func (this *Neo4j) GetNode(id uint) (tmp *NeoTemplate, err error) {
 	}
 	this.Method = "get"
 	url := this.URL + "/node/"
-	body, err := this.send(url+strconv.Uitoa(id), "") // convert uint -> string and send http request
+	body, err := this.send(url+strconv.FormatUint(uint64(id), 10), "") // convert uint -> string and send http request
 	if err != nil {
 		return tmp, err
 	}
@@ -327,7 +327,7 @@ func (this *Neo4j) SetRelationship(id uint, data map[string]string) error {
 	if err != nil {
 		return errors.New("Unable to Marshal Json data")
 	}
-	_, err = this.send(url+strconv.Uitoa(id)+"/properties", string(s))
+	_, err = this.send(url+strconv.FormatUint(uint64(id), 10)+"/properties", string(s))
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func (this *Neo4j) DelRelationship(id ...uint) error {
 	url := this.URL + "/relationship/"
 	for _, i := range id {
 		// delete each relationship for every id passed in
-		_, err := this.send(url+strconv.Uitoa(i), "")
+		_, err := this.send(url+strconv.FormatUint(uint64(i), 10), "")
 		if err != nil {
 			return err
 		}
@@ -696,7 +696,7 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 						node.Self, _ = data.(string) // cast it to a string with type assertion
 						// "self" provides easy access to the ID property of the node(relationship, index,etc), we'll take advantage and axe it off right now
 						selfSlice := strings.Split(string(node.Self), "/")         // slice string "Self" on each '/' char, -1 gets all instances
-						id, atouiErr := strconv.Atoui(selfSlice[len(selfSlice)-1]) // and pull off the last part which is the ID then string -> uint
+						id, atouiErr := strconv.ParseUint(selfSlice[len(selfSlice)-1], 10, 0) // and pull off the last part which is the ID then string -> uint
 						if atouiErr != nil {
 							return nil, atouiErr
 						}
