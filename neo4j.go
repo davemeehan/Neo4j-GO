@@ -651,7 +651,7 @@ func (this *Neo4j) send(url string, data string) (string, error) {
                         break
                 }
                 req.SetBasicAuth(this.Username, this.Password)
-                resp, err = client.Get(req)
+                resp, err = client.Do(req)
 
 	}
 	if err != nil {
