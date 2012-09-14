@@ -650,7 +650,7 @@ func (this *Neo4j) send(url string, data string) (string, error) {
                         err = e
                         break
                 }
-                req.SetBasicAuth(this.Username, this.Password)
+		this.setAuth(req)
                 resp, err = client.Do(req)
 
 	}
@@ -668,6 +668,11 @@ func (this *Neo4j) send(url string, data string) (string, error) {
 	}
 	this.StatusCode = resp.StatusCode // the calling method should do more inspection with chkStatusCode() method and determine if the operation was successful or not.
 	return buf.String(), nil
+}
+func (this *Neo4j) setAuth(req http.Request) {
+	if len(this.Username) > 0 || len(this.Password) > 0 {
+        	req.SetBasicAuth(this.Username, this.Password)
+	}
 }
 // this function unmarshals the individual node of data(or relationship etc). 
 // called internally to build the dataset of records returned from neo4j
