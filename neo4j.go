@@ -650,7 +650,7 @@ func (this *Neo4j) send(url string, data string) (string, error) {
                         err = e
                         break
                 }
-		this.setAuth(req)
+		this.setAuth(*req)
                 resp, err = client.Do(req)
 
 	}
