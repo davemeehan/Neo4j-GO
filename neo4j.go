@@ -44,7 +44,7 @@ type Error struct {
 }
 // used when storing data returned from neo4j
 type NeoTemplate struct {
-	ID                  uint
+	ID                  uint64
 	Relationships       string
 	RelationshipsOut    string
 	RelationshipsIn     string
@@ -269,7 +269,7 @@ func (this *Neo4j) GetNode(id uint) (tmp *NeoTemplate, err error) {
 	}
 	this.Method = "get"
 	url := this.URL + "/node/"
-	body, err := this.send(url+strconv.FormatUint(id, 10), "") // convert uint -> string and send http request
+	body, err := this.send(url+strconv.FormatUint(uint64(id), 10), "") // convert uint -> string and send http request
 	if err != nil {
 		return tmp, err
 	}
@@ -327,7 +327,7 @@ func (this *Neo4j) SetRelationship(id uint, data map[string]string) error {
 	if err != nil {
 		return errors.New("Unable to Marshal Json data")
 	}
-	_, err = this.send(url+strconv.FormatUint(id, 10)+"/properties", string(s))
+	_, err = this.send(url+strconv.FormatUint(uint64(id), 10)+"/properties", string(s))
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func (this *Neo4j) DelRelationship(id ...uint) error {
 	url := this.URL + "/relationship/"
 	for _, i := range id {
 		// delete each relationship for every id passed in
-		_, err := this.send(url+strconv.FormatUint(i, 10), "")
+		_, err := this.send(url+strconv.FormatUint(uint64(i), 10), "")
 		if err != nil {
 			return err
 		}
