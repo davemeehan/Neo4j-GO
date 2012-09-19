@@ -701,7 +701,8 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
                     
                     for dk, dv := range vv {
                         dvv, _ := dv.(string)
-                        uqData[dk], _ = strconv.Unquote(dvv)
+                        dvv, _ = strconv.Unquote(dvv)
+                        uqData[dk] = dvv
                     }
                     log.Printf("uqData is: %#v",uqData)
                     /*
