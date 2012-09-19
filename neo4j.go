@@ -701,7 +701,10 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
                     
                     for dk, dv := range vv {
                         dvv, _ := dv.(string)
-                        dvv, _ = strconv.Unquote(dvv)
+                        dvv, err := strconv.Unquote(dvv)
+                        if err != nil {
+                            log.Printf("unquote error: %v",err)   
+                        }
                         uqData[dk] = dvv
                     }
                     log.Printf("uqData is: %#v",uqData)
