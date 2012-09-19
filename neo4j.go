@@ -697,12 +697,20 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 				switch k {
 				case "data":
 					//node.Data = vv
+                    var uqData map[string]interface{}
+                    for dk, dv := range vv {
+                        append(uqData, {dk: strconv.Unquote(string(dv))})
+                    }
+                    log.Printf("uqData is: %#v",uqData)
+                    /*
                     var uqData interface{}
                     uqData, err := strconv.Unquote(string(vv))
                     if err != nil {
                         return nil, err   
                     }
+                    */
                     node.Data = uqData
+                    
 				case "extensions":
 					node.Extensions = vv
 				}
