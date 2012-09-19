@@ -696,7 +696,12 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 			case map[string]interface{}:
 				switch k {
 				case "data":
-					node.Data = vv
+                    uqData, err := strconv.Unquote(vv)
+                    if err != nil {
+                        return nil, err   
+                    }
+                    node.Data = uqData
+					//node.Data = vv
 				case "extensions":
 					node.Extensions = vv
 				}
@@ -755,10 +760,7 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 						node.Indexed, _ = data.(string)
 					}
 				}
-                node.Data, err := strconv.Unquote(node.Data)
-                if err != nil {
-                    return nil, err   
-                }
+                
 			}
 		}
 	}
