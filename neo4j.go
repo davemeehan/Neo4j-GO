@@ -755,7 +755,7 @@ func (this *Neo4j) unmarshalNode(template map[string]interface{}) (*NeoTemplate,
 						node.Indexed, _ = data.(string)
 					}
 				}
-                data, err := strconv.Unquote(data)
+                node.Data, err := strconv.Unquote(node.Data)
                 if err != nil {
                     return nil, err   
                 }
