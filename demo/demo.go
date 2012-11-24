@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	neo, err := neo4j.NewNeo4j("http://localhost:7474/db/data")
+	neo, err := neo4j.NewNeo4j("http://localhost:7474/db/data", "", "")
 	if err != nil {
 		log.Printf("%v\n", err)
 		return
