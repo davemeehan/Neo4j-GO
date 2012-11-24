@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/masiulaniec/Neo4j-GO"
+	"github.com/davemeehan/Neo4j-GO"
 	"log"
 )
 
