@@ -1,3 +1,8 @@
+DEPRECATED! 
+Consider these instead:
+https://github.com/johnnadratowski/golang-neo4j-bolt-driver
+https://github.com/go-cq/cq
+
 Install:
 If you don't have GOROOT in your environment make sure you set it to your base go dir.
 for example:
